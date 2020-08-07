@@ -1,0 +1,25 @@
+language: python
+python:
+  - "3.6"
+env:
+  global:
+    - VERSION=v0.2.0
+
+services:
+  - docker
+
+before_install:
+  - echo "$ALI_DOCKER_PASSWD" | docker login -u "$ALI_DOCKER_USER" --password-stdin registry.cn-zhangjiakou.aliyuncs.com
+  - echo "$DOCKER_PASSWD" | docker login -u "$DOCKER_USER" --password-stdin
+
+install:
+  - echo "skip install step"
+
+script: echo "There need some pytest, but now skip!"
+
+after_script:
+  - echo "build and push vikings/paddle:${VERSION}-${TRAVIS_BRANCH}"
+  - docker build -t registry.cn-zhangjiakou.aliyuncs.com/vikings/paddle:${VERSION}-${TRAVIS_BRANCH} -f Dockerfile .
+  - docker push registry.cn-zhangjiakou.aliyuncs.com/vikings/paddle:${VERSION}-${TRAVIS_BRANCH}
+  - docker tag registry.cn-zhangjiakou.aliyuncs.com/vikings/paddle:${VERSION}-${TRAVIS_BRANCH} vikings/paddle:${VERSION}-${TRAVIS_BRANCH}
+  - docker push vikings/paddle:${VERSION}-${TRAVIS_BRANCH}
